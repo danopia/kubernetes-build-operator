@@ -355,16 +355,11 @@ async function createBuildJob(buildRes: Build) {
             },
             // resources: {limits: {cpu: new Quantity(5, 'Gi')}},
             // image: 'quay.io/buildah/stable',
-            image: 'rg.nl-ams.scw.cloud/danopia-k8s-apps/buildah-with-git',
+            image: 'rg.nl-ams.scw.cloud/danopia-k8s-apps/image-buildah',
             command: ['bash', '-euxc', `
               git clone -- "$SOURCE_CONTEXT" app
               cd app/"$CONTEXT_DIR"
-
-              echo 'unqualified-search-registries = ["registry.ipv6.docker.com"]' \
-                > /etc/containers/registries.conf
-
               buildah bud -t "$TARGET_IMAGE" .
-
               buildah push --digestfile digestfile -- "$TARGET_IMAGE"
               echo "build.danopia.net digest=$(cat digestfile)"
             `.replace(/^ +/gm, '')],
