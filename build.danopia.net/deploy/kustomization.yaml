@@ -5,6 +5,7 @@ commonLabels:
 resources:
 - crds/Build.yaml
 - crds/BuildConfig.yaml
+- buildconfig.yaml
 - deployment.yaml
 - serviceaccount.yaml
 - rbac.yaml
