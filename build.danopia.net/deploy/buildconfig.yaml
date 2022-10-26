@@ -18,3 +18,5 @@ spec:
     to:
       kind: DockerImage
       name: kubernetes-build-operator
+  postCommit:
+    script: update-argocd-apps
