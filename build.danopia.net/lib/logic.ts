@@ -31,6 +31,7 @@ export async function checkBuilds() {
       console.log('Build needs status!', buildRes.metadata?.name);
 
       const jobRes = await createBuildJob(buildRes);
+      console.log(`Job created: ${jobRes.metadata?.namespace}/${jobRes.metadata?.name}`);
 
       await crdApi.namespace(buildRes.metadata?.namespace!).replaceBuildStatus(buildRes.metadata?.name!, {
         metadata: buildRes.metadata,
@@ -43,7 +44,7 @@ export async function checkBuilds() {
 
     } else if (buildRes.status.phase !== 'Complete') {
       const jobRes = await batchApi.namespace(jobNamespace).getJobStatus(buildRes.metadata?.name!);
-      console.log('Found job:', jobRes.metadata?.name);
+      console.log(`Job found: ${jobRes.metadata?.namespace}/${jobRes.metadata?.name}`);
       await updateBuildState(buildRes, jobRes);
     }
   }
@@ -214,7 +215,7 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
     const podLogLines = podLog.split('\n');
 
     const knownDigest = podLogLines.find(x => x.startsWith('build.danopia.net digest='))?.split('=')[1];
-    console.log({knownDigest});
+    console.log('Found image digest in output:', knownDigest);
     if (!knownDigest) throw new Error(`No knownDigest found`);
 
     // const startIdx = podLogLines.indexOf('+ buildah images --json dev');
@@ -305,6 +306,8 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
         },
       },
     });
+
+    console.log(`Job completed: ${jobRes.metadata?.namespace}/${jobRes.metadata?.name}`);
   }
 
   await crdApi.namespace(buildRes.metadata?.namespace!).replaceBuildStatus(buildRes.metadata?.name!, {
