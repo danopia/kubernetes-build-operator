@@ -51,6 +51,15 @@ rules:
   - "jobs/status"
   verbs:
   - "*"
+- apiGroups:
+  - ""
+  resources:
+  - "pods"
+  - "pods/log"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
