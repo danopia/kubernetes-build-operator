@@ -1,0 +1,9 @@
+commonLabels:
+  app.kubernetes.io/name: kubernetes-build-operator
+
+resources:
+- crds/Build.yaml
+- crds/BuildConfig.yaml
+- deployment.yaml
+- serviceaccount.yaml
+- rbac.yaml

@@ -1,0 +1,56 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: build-operator-manager
+rules:
+
+- apiGroups:
+  - "build.danopia.net"
+  resources:
+  - "builds"
+  - "builds/status"
+  - "buildconfigs"
+  - "buildconfigs/status"
+  verbs:
+  - "*"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: build-operator:manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: build-operator-manager
+subjects:
+- kind: ServiceAccount
+  name: build-operator
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: build-operator-reader
+rules:
+
+- apiGroups:
+  - "batch"
+  resources:
+  - "jobs"
+  verbs:
+  - "*"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: build-operator:reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: build-operator-reader
+subjects:
+- kind: ServiceAccount
+  name: build-operator

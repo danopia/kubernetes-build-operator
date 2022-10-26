@@ -1,0 +1,19 @@
+---
+kind: BuildConfig
+apiVersion: build.danopia.net/v1
+metadata:
+  name: build-operator
+spec:
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+  source:
+    type: Git
+    git:
+      uri: https://github.com/danopia/kubernetes-build-operator
+  strategy:
+    type: Docker
+  output:
+    to:
+      kind: DockerImage
+      name: kubernetes-build-operator

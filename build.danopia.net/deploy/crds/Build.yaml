@@ -1,0 +1,898 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: builds.build.danopia.net
+  labels:
+    group: build.danopia.net
+spec:
+  scope: Namespaced
+  group: build.danopia.net
+  names:
+    plural: builds
+    singular: build
+    kind: Build
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              properties:
+                completionDeadlineSeconds:
+                  format: int64
+                  type: integer
+                nodeSelector:
+                  additionalProperties:
+                    type: string
+                  type: object
+                output:
+                  properties:
+                    imageLabels:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        required:
+                          - name
+                        type: object
+                      type: array
+                    pushSecret:
+                      properties:
+                        name:
+                          type: string
+                      type: object
+                    to:
+                      properties:
+                        apiVersion:
+                          type: string
+                        fieldPath:
+                          type: string
+                        kind:
+                          type: string
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                        resourceVersion:
+                          type: string
+                        uid:
+                          type: string
+                      type: object
+                  type: object
+                postCommit:
+                  properties:
+                    args:
+                      items:
+                        type: string
+                      type: array
+                    command:
+                      items:
+                        type: string
+                      type: array
+                    script:
+                      type: string
+                  type: object
+                resources:
+                  properties:
+                    limits:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    requests:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  type: object
+                revision:
+                  properties:
+                    git:
+                      properties:
+                        author:
+                          properties:
+                            email:
+                              type: string
+                            name:
+                              type: string
+                          type: object
+                        commit:
+                          type: string
+                        committer:
+                          properties:
+                            email:
+                              type: string
+                            name:
+                              type: string
+                          type: object
+                        message:
+                          type: string
+                      type: object
+                    type:
+                      type: string
+                  required: &ref_5
+                    - type
+                  type: object
+                serviceAccount:
+                  type: string
+                source:
+                  properties:
+                    binary:
+                      properties:
+                        asFile:
+                          type: string
+                      type: object
+                    configMaps:
+                      items:
+                        properties:
+                          configMap:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                          destinationDir:
+                            type: string
+                        required:
+                          - configMap
+                        type: object
+                      type: array
+                    contextDir:
+                      type: string
+                    dockerfile:
+                      type: string
+                    git:
+                      properties:
+                        httpProxy:
+                          type: string
+                        httpsProxy:
+                          type: string
+                        noProxy:
+                          type: string
+                        ref:
+                          type: string
+                        uri:
+                          type: string
+                      required:
+                        - uri
+                      type: object
+                    images:
+                      items:
+                        properties:
+                          as:
+                            items:
+                              type: string
+                            type: array
+                          from:
+                            properties:
+                              apiVersion:
+                                type: string
+                              fieldPath:
+                                type: string
+                              kind:
+                                type: string
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                              resourceVersion:
+                                type: string
+                              uid:
+                                type: string
+                            type: object
+                          paths:
+                            items:
+                              properties:
+                                destinationDir:
+                                  type: string
+                                sourcePath:
+                                  type: string
+                              required:
+                                - sourcePath
+                                - destinationDir
+                              type: object
+                            type: array
+                          pullSecret:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                        required:
+                          - from
+                        type: object
+                      type: array
+                    secrets:
+                      items:
+                        properties:
+                          destinationDir:
+                            type: string
+                          secret:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                        required:
+                          - secret
+                        type: object
+                      type: array
+                    sourceSecret:
+                      properties:
+                        name:
+                          type: string
+                      type: object
+                    type:
+                      type: string
+                  required:
+                    - type
+                  type: object
+                strategy:
+                  properties:
+                    customStrategy:
+                      properties:
+                        buildAPIVersion:
+                          type: string
+                        env:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  configMapKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: &ref_0
+                                      - key
+                                    type: object
+                                  fieldRef:
+                                    properties:
+                                      apiVersion:
+                                        type: string
+                                      fieldPath:
+                                        type: string
+                                    required: &ref_1
+                                      - fieldPath
+                                    type: object
+                                  resourceFieldRef:
+                                    properties:
+                                      containerName:
+                                        type: string
+                                      divisor:
+                                        type: string
+                                      resource:
+                                        type: string
+                                    required: &ref_2
+                                      - resource
+                                    type: object
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: &ref_3
+                                      - key
+                                    type: object
+                                type: object
+                            required: &ref_4
+                              - name
+                            type: object
+                          type: array
+                        exposeDockerSocket:
+                          type: boolean
+                        forcePull:
+                          type: boolean
+                        from:
+                          properties:
+                            apiVersion:
+                              type: string
+                            fieldPath:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                            resourceVersion:
+                              type: string
+                            uid:
+                              type: string
+                          type: object
+                        pullSecret:
+                          properties:
+                            name:
+                              type: string
+                          type: object
+                        secrets:
+                          items:
+                            properties:
+                              mountPath:
+                                type: string
+                              secretSource:
+                                properties:
+                                  name:
+                                    type: string
+                                type: object
+                            required:
+                              - secretSource
+                              - mountPath
+                            type: object
+                          type: array
+                      required:
+                        - from
+                      type: object
+                    dockerStrategy:
+                      properties:
+                        buildArgs:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  configMapKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_0
+                                    type: object
+                                  fieldRef:
+                                    properties:
+                                      apiVersion:
+                                        type: string
+                                      fieldPath:
+                                        type: string
+                                    required: *ref_1
+                                    type: object
+                                  resourceFieldRef:
+                                    properties:
+                                      containerName:
+                                        type: string
+                                      divisor:
+                                        type: string
+                                      resource:
+                                        type: string
+                                    required: *ref_2
+                                    type: object
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_3
+                                    type: object
+                                type: object
+                            required: *ref_4
+                            type: object
+                          type: array
+                        dockerfilePath:
+                          type: string
+                        env:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  configMapKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_0
+                                    type: object
+                                  fieldRef:
+                                    properties:
+                                      apiVersion:
+                                        type: string
+                                      fieldPath:
+                                        type: string
+                                    required: *ref_1
+                                    type: object
+                                  resourceFieldRef:
+                                    properties:
+                                      containerName:
+                                        type: string
+                                      divisor:
+                                        type: string
+                                      resource:
+                                        type: string
+                                    required: *ref_2
+                                    type: object
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_3
+                                    type: object
+                                type: object
+                            required: *ref_4
+                            type: object
+                          type: array
+                        forcePull:
+                          type: boolean
+                        from:
+                          properties:
+                            apiVersion:
+                              type: string
+                            fieldPath:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                            resourceVersion:
+                              type: string
+                            uid:
+                              type: string
+                          type: object
+                        imageOptimizationPolicy:
+                          type: string
+                        noCache:
+                          type: boolean
+                        pullSecret:
+                          properties:
+                            name:
+                              type: string
+                          type: object
+                      type: object
+                    jenkinsPipelineStrategy:
+                      properties:
+                        env:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  configMapKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_0
+                                    type: object
+                                  fieldRef:
+                                    properties:
+                                      apiVersion:
+                                        type: string
+                                      fieldPath:
+                                        type: string
+                                    required: *ref_1
+                                    type: object
+                                  resourceFieldRef:
+                                    properties:
+                                      containerName:
+                                        type: string
+                                      divisor:
+                                        type: string
+                                      resource:
+                                        type: string
+                                    required: *ref_2
+                                    type: object
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_3
+                                    type: object
+                                type: object
+                            required: *ref_4
+                            type: object
+                          type: array
+                        jenkinsfile:
+                          type: string
+                        jenkinsfilePath:
+                          type: string
+                      type: object
+                    sourceStrategy:
+                      properties:
+                        env:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              value:
+                                type: string
+                              valueFrom:
+                                properties:
+                                  configMapKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_0
+                                    type: object
+                                  fieldRef:
+                                    properties:
+                                      apiVersion:
+                                        type: string
+                                      fieldPath:
+                                        type: string
+                                    required: *ref_1
+                                    type: object
+                                  resourceFieldRef:
+                                    properties:
+                                      containerName:
+                                        type: string
+                                      divisor:
+                                        type: string
+                                      resource:
+                                        type: string
+                                    required: *ref_2
+                                    type: object
+                                  secretKeyRef:
+                                    properties:
+                                      key:
+                                        type: string
+                                      name:
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    required: *ref_3
+                                    type: object
+                                type: object
+                            required: *ref_4
+                            type: object
+                          type: array
+                        forcePull:
+                          type: boolean
+                        from:
+                          properties:
+                            apiVersion:
+                              type: string
+                            fieldPath:
+                              type: string
+                            kind:
+                              type: string
+                            name:
+                              type: string
+                            namespace:
+                              type: string
+                            resourceVersion:
+                              type: string
+                            uid:
+                              type: string
+                          type: object
+                        incremental:
+                          type: boolean
+                        pullSecret:
+                          properties:
+                            name:
+                              type: string
+                          type: object
+                        scripts:
+                          type: string
+                      required:
+                        - from
+                      type: object
+                    type:
+                      type: string
+                  required:
+                    - type
+                  type: object
+                triggeredBy:
+                  items:
+                    properties:
+                      bitbucketWebHook:
+                        properties:
+                          revision:
+                            properties:
+                              git:
+                                properties:
+                                  author:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  commit:
+                                    type: string
+                                  committer:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  message:
+                                    type: string
+                                type: object
+                              type:
+                                type: string
+                            required: *ref_5
+                            type: object
+                          secret:
+                            type: string
+                        type: object
+                      genericWebHook:
+                        properties:
+                          revision:
+                            properties:
+                              git:
+                                properties:
+                                  author:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  commit:
+                                    type: string
+                                  committer:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  message:
+                                    type: string
+                                type: object
+                              type:
+                                type: string
+                            required: *ref_5
+                            type: object
+                          secret:
+                            type: string
+                        type: object
+                      githubWebHook:
+                        properties:
+                          revision:
+                            properties:
+                              git:
+                                properties:
+                                  author:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  commit:
+                                    type: string
+                                  committer:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  message:
+                                    type: string
+                                type: object
+                              type:
+                                type: string
+                            required: *ref_5
+                            type: object
+                          secret:
+                            type: string
+                        type: object
+                      gitlabWebHook:
+                        properties:
+                          revision:
+                            properties:
+                              git:
+                                properties:
+                                  author:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  commit:
+                                    type: string
+                                  committer:
+                                    properties:
+                                      email:
+                                        type: string
+                                      name:
+                                        type: string
+                                    type: object
+                                  message:
+                                    type: string
+                                type: object
+                              type:
+                                type: string
+                            required: *ref_5
+                            type: object
+                          secret:
+                            type: string
+                        type: object
+                      imageChangeBuild:
+                        properties:
+                          fromRef:
+                            properties:
+                              apiVersion:
+                                type: string
+                              fieldPath:
+                                type: string
+                              kind:
+                                type: string
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                              resourceVersion:
+                                type: string
+                              uid:
+                                type: string
+                            type: object
+                          imageID:
+                            type: string
+                        type: object
+                      message:
+                        type: string
+                    type: object
+                  type: array
+              required:
+                - strategy
+              type: object
+            status:
+              properties:
+                cancelled:
+                  type: boolean
+                completionTimestamp:
+                  format: date-time
+                  type: string
+                conditions:
+                  items:
+                    properties:
+                      lastTransitionTime:
+                        format: date-time
+                        type: string
+                      lastUpdateTime:
+                        format: date-time
+                        type: string
+                      message:
+                        type: string
+                      reason:
+                        type: string
+                      status:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                      - type
+                      - status
+                    type: object
+                  type: array
+                config:
+                  properties:
+                    apiVersion:
+                      type: string
+                    fieldPath:
+                      type: string
+                    kind:
+                      type: string
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    resourceVersion:
+                      type: string
+                    uid:
+                      type: string
+                  type: object
+                duration:
+                  format: int64
+                  type: integer
+                logSnippet:
+                  type: string
+                message:
+                  type: string
+                output:
+                  properties:
+                    to:
+                      properties:
+                        imageDigest:
+                          type: string
+                      type: object
+                  type: object
+                outputDockerImageReference:
+                  type: string
+                phase:
+                  type: string
+                reason:
+                  type: string
+                stages:
+                  items:
+                    properties:
+                      durationMilliseconds:
+                        format: int64
+                        type: integer
+                      name:
+                        type: string
+                      startTime:
+                        format: date-time
+                        type: string
+                      steps:
+                        items:
+                          properties:
+                            durationMilliseconds:
+                              format: int64
+                              type: integer
+                            name:
+                              type: string
+                            startTime:
+                              format: date-time
+                              type: string
+                          type: object
+                        type: array
+                    type: object
+                  type: array
+                startTimestamp:
+                  format: date-time
+                  type: string
+              required:
+                - phase
+              type: object
+          type: object
+
+      additionalPrinterColumns:
+      - jsonPath: .spec.strategy.type
+        name: Type
+        type: string
+      - jsonPath: .spec.source.type # TODO: really "Git@c50731b"
+        name: From
+        type: string
+      - jsonPath: .status.phase
+        name: Status
+        type: string
+      - jsonPath: .status.startTimestamp
+        description: The age of this resource
+        name: Started
+        type: date
+      # TODO: this next column should be "Duration"
+      - jsonPath: .status.completionTimestamp
+        name: Completed
+        type: date

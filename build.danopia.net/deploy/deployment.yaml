@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: build-operator-loop
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  template:
+    spec:
+      serviceAccountName: build-operator
+      containers:
+      - name: loop
+        image: kubernetes-build-operator
+
+        resources:
+          requests:
+            cpu: 5m
+            memory: 30Mi
+          limits:
+            cpu: 250m
+            memory: 100Mi
