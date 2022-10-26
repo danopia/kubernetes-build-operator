@@ -727,4 +727,14 @@ spec:
           required:
             - spec
           type: object
-      additionalPrinterColumns: []
+
+      additionalPrinterColumns:
+      - jsonPath: .spec.strategy.type
+        name: Type
+        type: string
+      - jsonPath: .spec.source.type # TODO: really "Git@c50731b"
+        name: From
+        type: string
+      - jsonPath: .status.lastVersion
+        name: Latest
+        type: string
