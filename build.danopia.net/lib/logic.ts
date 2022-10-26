@@ -1,12 +1,12 @@
 import { autoDetectClient, BatchV1Api, CoreV1Api, Job } from "./deps.ts";
 
-import { Build, BuildConfig, BuildDistAppV1Api } from "./build.danopia.net@v1/mod.ts";
+import { Build, BuildConfig, BuildDanopiaNetV1Api } from "./build.danopia.net@v1/mod.ts";
 import { updateArgoImageRefs } from "./argocd.ts";
 
 const kubernetes = await autoDetectClient();
 const coreApi = new CoreV1Api(kubernetes);
 const batchApi = new BatchV1Api(kubernetes);
-const crdApi = new BuildDistAppV1Api(kubernetes);
+const crdApi = new BuildDanopiaNetV1Api(kubernetes);
 
 const jobNamespace = "image-builds"; // TODO
 
