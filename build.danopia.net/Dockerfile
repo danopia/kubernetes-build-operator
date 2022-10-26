@@ -2,7 +2,7 @@ FROM denoland/deno:alpine-1.26.2
 WORKDIR /app
 
 ADD lib/deps.ts lib/
-RUN ["deno", "cache", "deps.ts"]
+RUN ["deno", "cache", "lib/deps.ts"]
 
 ADD lib lib/
 RUN ["deno", "cache", "--check", "lib/main.ts"]
