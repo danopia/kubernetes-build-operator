@@ -11,7 +11,7 @@ spec:
       serviceAccountName: build-operator
       containers:
       - name: loop
-        image: kubernetes-build-operator
+        image: build-operator
 
         resources:
           requests:
