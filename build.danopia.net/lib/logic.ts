@@ -359,6 +359,7 @@ async function createBuildJob(buildRes: Build) {
             command: ['bash', '-euxc', `
               git clone -- "$SOURCE_CONTEXT" app
               cd app/"$CONTEXT_DIR"
+              ${buildRes.spec.source.dockerfile ? `echo "${btoa(buildRes.spec.source.dockerfile)}" | base64 -D > Dockerfile` : '# using dockerfile from repo'}
               buildah bud -t "$TARGET_IMAGE" .
               buildah push --digestfile digestfile -- "$TARGET_IMAGE"
               echo "build.danopia.net digest=$(cat digestfile)"
