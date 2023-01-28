@@ -43,7 +43,7 @@ export async function checkBuilds() {
       });
       await updateBuildState(buildRes, jobRes);
 
-    } else if (buildRes.status.phase !== 'Complete') {
+    } else if (buildRes.status.phase !== 'Complete' && buildRes.status.phase !== 'Failed') {
       const jobRes = await batchApi.namespace(jobNamespace).getJobStatus(buildRes.metadata?.name!);
       console.log(`Job found: ${jobRes.metadata?.namespace}/${jobRes.metadata?.name}`);
       await updateBuildState(buildRes, jobRes);
