@@ -230,7 +230,7 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
   if (status.phase == 'Failed') {
     const podList = await coreApi.namespace(jobRes.metadata?.namespace!).getPodList({
       labelSelector: 'job-name='+jobRes.metadata?.name,
-      fieldSelector: 'status.phase=Error',
+      fieldSelector: 'status.phase=Failed',
       limit: 1,
     });
     const [podRes] = podList.items;
