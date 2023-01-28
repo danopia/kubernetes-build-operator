@@ -64,13 +64,13 @@ async function createBuild(configRes: BuildConfig, buildNum: number) {
       }],
       labels: {
         buildconfig: configRes.metadata?.name!,
-        'k8s.danopia.net.io/build-config.name': configRes.metadata?.name!,
-        'k8s.danopia.net.io/build.start-policy': configRes.spec.runPolicy!,
+        'build.danopia.net/config.name': configRes.metadata?.name!,
+        'build.danopia.net/start-policy': configRes.spec.runPolicy!,
       },
       annotations: {
-        'k8s.danopia.net.io/build-config.name': configRes.metadata?.name!,
-        'k8s.danopia.net.io/build.number': `${buildNum}`,
-        // 'k8s.danopia.net.io/build.pod-name': 'TODO',
+        'build.danopia.net/config.name': configRes.metadata?.name!,
+        'build.danopia.net/number': `${buildNum}`,
+        // 'build.danopia.net/pod-name': 'TODO',
       },
     },
     spec: {
@@ -153,6 +153,30 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
         type: "Complete",
       }];
       break;
+    case !!jobRes.status?.failed:
+      status.phase = 'Failed';
+      status.conditions = [{
+        lastTransitionTime: jobRes.metadata?.creationTimestamp,
+        lastUpdateTime: jobRes.metadata?.creationTimestamp,
+        status: "False",
+        type: "New",
+      }, {
+        lastTransitionTime: jobRes.status?.startTime,
+        lastUpdateTime: jobRes.status?.startTime,
+        status: "False",
+        type: "Pending",
+      }, {
+        lastTransitionTime: jobRes.status?.conditions?.[0]?.lastTransitionTime,
+        lastUpdateTime: jobRes.status?.conditions?.[0]?.lastTransitionTime,
+        status: "False",
+        type: "Running",
+      }, {
+        lastTransitionTime: jobRes.status?.conditions?.[0]?.lastTransitionTime,
+        lastUpdateTime: jobRes.status?.conditions?.[0]?.lastTransitionTime,
+        status: "True",
+        type: "Complete",
+      }];
+      break;
     case !!jobRes.status?.active:
       status.phase = 'Running';
       status.conditions = [{
@@ -203,6 +227,39 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
       break;
   }
 
+  if (status.phase == 'Failed') {
+    const podList = await coreApi.namespace(jobRes.metadata?.namespace!).getPodList({
+      labelSelector: 'job-name='+jobRes.metadata?.name,
+      fieldSelector: 'status.phase=Succeeded',
+      limit: 1,
+    });
+    const [podRes] = podList.items;
+    if (!podRes) throw new Error(`Where did our pod go for ${jobRes.metadata?.name}??`);
+
+    const podLog = await coreApi.namespace(podRes.metadata?.namespace!).getPodLog(podRes.metadata?.name!);
+    const podLogLines = podLog.split('\n');
+    status.logSnippet = podLogLines.slice(-25).join('\n');
+
+    const endTime = podRes
+      .status?.conditions
+      ?.find(x => x.type == 'Ready')
+      ?.lastTransitionTime;
+    if (endTime && status?.startTimestamp) {
+      const durationMilliseconds = endTime.valueOf() - status.startTimestamp.valueOf();
+      status.duration = Math.round(durationMilliseconds / 1000 * 1_000_000_000);
+      // rounded nanos? e.g. 55000000000
+    }
+
+    buildRes = await crdApi.namespace(buildRes.metadata?.namespace!).patchBuild(buildRes.metadata?.name!, 'json-merge', {
+      metadata: {
+        annotations: {
+          'build.danopia.net/pod-name': podRes.metadata?.name!,
+        },
+      },
+    });
+
+  }
+
   if (status.phase == 'Complete') {
     const podList = await coreApi.namespace(jobRes.metadata?.namespace!).getPodList({
       labelSelector: 'job-name='+jobRes.metadata?.name,
@@ -251,7 +308,7 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
       status.outputDockerImageReference = `${targetRef.replace(/:[^/]+/, '')+'@'+knownDigest}`;
     }
 
-    const buildConfigName = buildRes.metadata?.labels?.['k8s.danopia.net.io/build-config.name'];
+    const buildConfigName = buildRes.metadata?.labels?.['build.danopia.net/config.name'];
     if (buildConfigName && status.outputDockerImageReference) {
       await updateArgoImageRefs(kubernetes, {
         argoNamespace: 'argocd',
@@ -303,7 +360,7 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
     buildRes = await crdApi.namespace(buildRes.metadata?.namespace!).patchBuild(buildRes.metadata?.name!, 'json-merge', {
       metadata: {
         annotations: {
-          'k8s.danopia.net.io/build.pod-name': podRes.metadata?.name!,
+          'build.danopia.net/pod-name': podRes.metadata?.name!,
         },
       },
     });
