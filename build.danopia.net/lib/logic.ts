@@ -2,6 +2,7 @@ import { autoDetectClient, BatchV1Api, CoreV1Api, Job } from "./deps.ts";
 
 import { Build, BuildConfig, BuildDanopiaNetV1Api } from "./build.danopia.net@v1/mod.ts";
 import { updateArgoImageRefs } from "./argocd.ts";
+import { Quantity } from "https://deno.land/x/kubernetes_apis@v0.3.2/common.ts";
 
 const kubernetes = await autoDetectClient();
 const coreApi = new CoreV1Api(kubernetes);
@@ -344,6 +345,7 @@ async function createBuildJob(buildRes: Build) {
       // }],
     },
     spec: {
+      ttlSecondsAfterFinished: 60 * 60,
       template: {
         spec: {
           nodeSelector: buildRes.spec.nodeSelector,
@@ -353,11 +355,22 @@ async function createBuildJob(buildRes: Build) {
             securityContext: {
               privileged: true,
             },
-            // resources: {limits: {cpu: new Quantity(5, 'Gi')}},
+            resources: {
+              requests: {
+                cpu: new Quantity(1000, 'm'),
+                memory: new Quantity(4, 'Gi'),
+              },
+              limits: {
+                cpu: new Quantity(1000, 'm'),
+                memory: new Quantity(4, 'Gi'),
+              },
+            },
             // image: 'quay.io/buildah/stable',
-            image: 'rg.nl-ams.scw.cloud/danopia-k8s-apps/image-buildah',
+            image: 'rg.nl-ams.scw.cloud/danopia-k8s-apps/image-buildah', // has git :)
             command: ['bash', '-euxc', `
-              git clone -- "$SOURCE_CONTEXT" app
+              ${buildRes.spec.source.git
+                ? `git clone -- "$SOURCE_CONTEXT" app`
+                : `mkdir -p app/"$CONTEXT_DIR"`}
               cd app/"$CONTEXT_DIR"
               ${buildRes.spec.source.dockerfile
                 ? `echo "${btoa(buildRes.spec.source.dockerfile)}" | base64 --decode > Dockerfile`
