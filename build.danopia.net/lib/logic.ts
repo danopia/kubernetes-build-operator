@@ -1,4 +1,4 @@
-import { autoDetectClient, BatchV1Api, CoreV1Api, Job } from "./deps.ts";
+import { autoDetectClient, BatchV1Api, CoreV1Api, Job, trace } from "./deps.ts";
 
 import { Build, BuildConfig, BuildDanopiaNetV1Api } from "./build.danopia.net@v1/mod.ts";
 import { updateArgoImageRefs } from "./argocd.ts";
@@ -11,7 +11,16 @@ const crdApi = new BuildDanopiaNetV1Api(kubernetes);
 
 const jobNamespace = "image-builds"; // TODO
 
-export async function checkBuildConfigs() {
+const appTracer = trace.getTracer('app');
+function wrapAction<Targs extends unknown[],Tret>(spanName: string, func: (...args: Targs) => Promise<Tret>) {
+  return (...args: Targs) =>
+    appTracer.startActiveSpan(spanName, {}, span =>
+      func(...args)
+        .catch(err => (span.recordException(err), Promise.reject(err)))
+        .finally(() => span.end()));
+}
+
+export const checkBuildConfigs = wrapAction('checkBuildConfigs', async () => {
   console.log('Checking all BuildConfigs...');
   const allConfigs = await crdApi.getBuildConfigListForAllNamespaces();
   for (const config of allConfigs.items) {
@@ -22,9 +31,9 @@ export async function checkBuildConfigs() {
       await createBuild(config, (config.status.lastVersion ?? -2) + 1);
     }
   }
-}
+});
 
-export async function checkBuilds() {
+export const checkBuilds = wrapAction('checkBuilds', async () => {
   console.log('Checking all Builds...');
   const allBuilds = await crdApi.getBuildListForAllNamespaces();
   for (const buildRes of allBuilds.items) {
@@ -49,9 +58,9 @@ export async function checkBuilds() {
       await updateBuildState(buildRes, jobRes);
     }
   }
-}
+});
 
-async function createBuild(configRes: BuildConfig, buildNum: number) {
+const createBuild = wrapAction('createBuild', async (configRes: BuildConfig, buildNum: number) => {
   const build = await crdApi.namespace(configRes.metadata?.namespace!).createBuild({
     metadata: {
       name: `${configRes.metadata?.name}-h${buildNum}`,
@@ -113,9 +122,9 @@ async function createBuild(configRes: BuildConfig, buildNum: number) {
   const jobRes = await createBuildJob(build);
 
   await updateBuildState(build, jobRes);
-}
+});
 
-async function updateBuildState(buildRes: Build, jobRes: Job) {
+const updateBuildState = wrapAction('updateBuildState', async (buildRes: Build, jobRes: Job) => {
   const status: Build['status'] = {
     config: {
       kind: 'BuildConfig',
@@ -372,9 +381,9 @@ async function updateBuildState(buildRes: Build, jobRes: Job) {
     metadata: buildRes.metadata,
     status,
   });
-}
+});
 
-async function createBuildJob(buildRes: Build) {
+const createBuildJob = wrapAction('createBuildJob', async (buildRes: Build) => {
   if (buildRes.spec?.source?.type !== 'Git') {
     throw new Error(`TODO: non-git source types`);
   }
@@ -478,4 +487,4 @@ async function createBuildJob(buildRes: Build) {
       backoffLimit: 0,
     },
   });
-}
+})
