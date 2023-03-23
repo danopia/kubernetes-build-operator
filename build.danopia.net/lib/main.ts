@@ -7,7 +7,7 @@ import { trace } from "./tracer.ts";
 
 const loopTracer = trace.getTracer('loop');
 
-for await (const _ of fixedInterval(10 * 1000)) {
+for await (const _ of fixedInterval(30 * 1000)) {
   console.log('---', new Date());
 
   await loopTracer.startActiveSpan('main', {}, async rootSpan => {
