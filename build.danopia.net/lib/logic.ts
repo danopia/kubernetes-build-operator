@@ -424,11 +424,11 @@ const createBuildJob = wrapAction('createBuildJob', async (buildRes: Build) => {
             resources: {
               requests: {
                 cpu: new Quantity(1000, 'm'),
-                memory: new Quantity(4, 'Gi'),
+                memory: new Quantity(6, 'Gi'),
               },
               limits: {
                 cpu: new Quantity(1000, 'm'),
-                memory: new Quantity(4, 'Gi'),
+                memory: new Quantity(6, 'Gi'),
               },
             },
             // image: 'quay.io/buildah/stable',
