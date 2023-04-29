@@ -16,7 +16,7 @@ spec:
       containers:
 
       - name: loop
-        image: kube-pet-loop-blockdevice
+        image: kubernetes-node-crds
 
         securityContext:
           # capabilities:
