@@ -10,7 +10,7 @@ spec:
   source:
     type: Git
     git:
-      uri: https://github.com/danopia/kubernetes-build-operator
+      uri: https://github.com/danopia/kubernetes-operators
     contextDir: build.danopia.net
   strategy:
     type: Docker

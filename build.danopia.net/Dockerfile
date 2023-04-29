@@ -5,6 +5,6 @@ ADD lib/deps.ts lib/
 RUN ["deno", "cache", "lib/deps.ts"]
 
 ADD lib lib/
-RUN ["deno", "cache", "--check", "lib/main.ts"]
+RUN ["deno", "check", "lib/main.ts"]
 
 ENTRYPOINT ["deno", "run", "--unstable", "--allow-net", "--allow-hrtime", "--allow-read", "--allow-env", "--cached-only", "lib/main.ts"]
