@@ -1,0 +1,12 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: loop-blockdevices
+spec:
+
+  template:
+    spec:
+
+      nodeSelector:
+        node-role.kubernetes.io/residental: ''
