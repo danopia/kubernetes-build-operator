@@ -473,7 +473,7 @@ const createBuildJob = wrapAction('createBuildJob', async (buildRes: Build) => {
           volumes: [{
             name: 'containers',
             hostPath: {
-              path: '/tmp/k8s-buildah-containers',
+              path: Deno.env.get('HOST_CACHE_PATH') ?? '/tmp/k8s-buildah-containers',
             },
           }, {
             name: 'auth',
