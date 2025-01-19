@@ -18,5 +18,3 @@ spec:
     to:
       kind: DockerImage
       name: kubernetes-node-crds
-  postCommit:
-    script: update-argocd-apps
