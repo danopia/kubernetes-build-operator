@@ -12,6 +12,17 @@ spec:
       containers:
       - name: loop
         image: build-operator
+        command:
+          - "deno"
+          - "run"
+          - "--unstable"
+          - "--allow-net"
+          - "--allow-hrtime"
+          - "--allow-read"
+          - "--allow-env"
+          - "--allow-sys"
+          - "--cached-only"
+          - "lib/main.ts"
 
         resources:
           requests:
