@@ -1,4 +1,4 @@
-FROM registry.ipv6.docker.com/denoland/deno:alpine-1.31.2
+FROM denoland/deno:alpine-1.31.2
 WORKDIR /app
 
 ADD lib/deps.ts lib/
