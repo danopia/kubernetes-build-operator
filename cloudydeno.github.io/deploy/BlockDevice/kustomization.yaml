@@ -7,6 +7,3 @@ resources:
 - rbac-loop.yaml
 - rbac-view.yaml
 - daemonset.yaml
-
-patches:
-- patch-scheduling.yaml
