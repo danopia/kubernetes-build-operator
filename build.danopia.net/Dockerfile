@@ -1,4 +1,4 @@
-FROM denoland/deno:alpine-1.31.2
+FROM denoland/deno:alpine-1.35.0
 WORKDIR /app
 
 ADD lib/deps.ts lib/
