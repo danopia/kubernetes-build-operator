@@ -441,7 +441,7 @@ const createBuildJob = wrapAction('createBuildJob', async (buildRes: Build) => {
               ${buildRes.spec.source.dockerfile
                 ? `echo "${btoa(buildRes.spec.source.dockerfile)}" | base64 --decode > Dockerfile`
                 : '# using dockerfile from repo'}
-              buildah bud -t "$TARGET_IMAGE" .
+              buildah bud --network=slirp4netns:enable_ipv6=false -t "$TARGET_IMAGE" .
               buildah push --digestfile digestfile -- "$TARGET_IMAGE"
               ${!targetRef.includes(':') ? `
                 TAGGED_TARGET="$TARGET_IMAGE:$(git rev-parse --short HEAD)-$(date +%s)"
