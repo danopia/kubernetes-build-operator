@@ -443,9 +443,11 @@ const createBuildJob = wrapAction('createBuildJob', async (buildRes: Build) => {
                 : '# using dockerfile from repo'}
               buildah bud -t "$TARGET_IMAGE" .
               buildah push --digestfile digestfile -- "$TARGET_IMAGE"
-              ${!targetRef.includes(':')
-                ? `buildah push --digestfile digestfile -- "$TARGET_IMAGE:$(git rev-parse --short HEAD)-$(date +%s)"`
-                : ``}
+              ${!targetRef.includes(':') ? `
+                TAGGED_TARGET="$TARGET_IMAGE:$(git rev-parse --short HEAD)-$(date +%s)"
+                buildah tag -- "$TARGET_IMAGE" "$TAGGED_TARGET"
+                buildah push --digestfile digestfile -- "$TAGGED_TARGET"
+              ` : ``}
               echo "build.danopia.net digest=$(cat digestfile)"
             `.replace(/^ +/gm, '')],
             env: [{
